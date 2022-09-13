@@ -5,7 +5,6 @@ Created on Fri May 20 16:43:20 2022
 @author: katha
 """
 
-
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
@@ -20,17 +19,20 @@ import pickle
 from scipy import stats
 import scipy
 import pickle
-warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.filterwarnings("ignore")
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
+# https://stackoverflow.com/questions/28107939/assigning-networkx-edge-attributes-weights-to-a-dict
 def get_edge_attributes(G, name):
     edges = G.edges(data=True)
     return dict( (x[:-1], x[-1][name]) for x in edges if name in x[-1] )
 
+# fix seeds for reproduceability
 np.random.seed(0)
 python_random.seed(0)
 tf.random.set_seed(0)
 
-name = "BTNORTHAMERICA" # one of GEANT2001, BREN, BTNORTHAMERICA, GTSSLOVAKIA
+name = "BREN" # one of GEANT2001, BREN, BTNORTHAMERICA, GTSSLOVAKIA
 graph_metrics = []
 load = False
 save = True
@@ -76,7 +78,7 @@ bcw_real = np.mean(bcsw_real)
 ccw_real = np.mean(ccsw_real)
 
 path = name+"_naive\\"
-#path = name+"\\"
+
 for k in range(100):
     for s in range(10):
         nr_nodes = len(adj_matrix_real)
@@ -241,15 +243,11 @@ elif color == "BW":
      graph_metrics_df.to_csv("graph_metrics_"+name+"_BW.csv",index=False,sep=";")
 elif color == "RGB":
      graph_metrics_df.to_csv("graph_metrics_"+name+"_RGB.csv",index=False,sep=";")
+     
 print("BC " + str(np.mean(graph_metrics_df["BC"])))
 print("CC " + str(np.mean(graph_metrics_df["CC"])))
 print("DC " + str(np.mean(graph_metrics_df["DC"])))
-print("BC std" + str(np.std(graph_metrics_df["BC"] / np.mean(graph_metrics_df["BC"]))))
-print("CC std" + str(np.std(graph_metrics_df["CC"] / np.mean(graph_metrics_df["CC"]))))
-print("DC std" + str(np.std(graph_metrics_df["DC"] / np.mean(graph_metrics_df["DC"]))) )       
+ 
 print("BCW " + str(np.mean(graph_metrics_df["BCW"])))
 print("CCW " + str(np.mean(graph_metrics_df["CCW"])))
-
-print("BCW std" + str(np.std(graph_metrics_df["BCW"] / np.mean(graph_metrics_df["BCW"]))))
-print("CCW std" + str(np.std(graph_metrics_df["CCW"] / np.mean(graph_metrics_df["CCW"]))))
 
