@@ -10,7 +10,7 @@ import numpy as np
 import networkx as nx
 from wangan import WANGAN
 
-name = "GtsSlovakia"
+name = "BREN"
 path = name + "_naive"
 isExist = os.path.exists(path)
 if not isExist:
@@ -20,7 +20,7 @@ adj_matrix = np.loadtxt("adj_matrices\\"+ name + "_weighted.txt")
 G_weighted = nx.from_numpy_matrix(adj_matrix) 
 
 learning_rate = 0.001
-epochs = 500
+epochs = 1000
 batch_size = 100 # 50 if GtsSlovakia 100 else
 samples = 10000
 
