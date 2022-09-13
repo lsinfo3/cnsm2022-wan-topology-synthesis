@@ -5,29 +5,25 @@ Created on Fri May 20 16:38:07 2022
 @author: katha
 """
 
-import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 import random as python_random
-import copy
-import seaborn as sns
 import random
 import warnings
 import pandas as pd
 import networkx as nx
 import pickle
 from scipy import stats
-import scipy
-import pickle
-import os
 from traditional import synth_BA, synth_ER, synth_WS, synth_2K
-import warnings
-warnings.filterwarnings("ignore")
+import copy
+warnings.simplefilter(action='ignore')
+
+# https://stackoverflow.com/questions/28107939/assigning-networkx-edge-attributes-weights-to-a-dict
 def get_edge_attributes(G, name):
     edges = G.edges(data=True)
     return dict( (x[:-1], x[-1][name]) for x in edges if name in x[-1] )
 
-names = ["GEANT2001"]
+names = ["GTSSLOVAKIA"]
 algos = ["2K", "BA", "ER", "WS"]
 
 load = False
@@ -41,23 +37,17 @@ for name in names:
         python_random.seed(0)
         tf.random.set_seed(0)
         
-        #name = "BREN"
         graph_metrics = []
-        #algo = "2K"
 
         
         adj_matrix_real = np.loadtxt("adj_matrices\\"+name+"_weighted.txt")
-        #adj_matrix_real = np.sqrt(adj_matrix_real)
         maximum_dist = np.max(adj_matrix_real)
-        #adj_matrix_real = (adj_matrix_real / maximum_dist)
-        #network = nx.Graph(adj_matrix_real)
-        
+
         real = nx.Graph(np.squeeze(adj_matrix_real),data = True)
-        # with open(name+"\\real.pkl","wb") as f:
-        #    pickle.dump(real,f)
+
         
         links_real = len(real.edges)
-        #weights_real = sum(sum(adj_matrix_real))/2
+
         
         weights_real = list(get_edge_attributes(real, 'weight').values())
         
@@ -112,8 +102,7 @@ for name in names:
                 print("Sample loaded.")
                 with open(path +"synth_sample_"+algo+"_"+str(k)+"_.pkl","rb") as f:
                     full_graph = pickle.load(f)
-            # nx.draw_networkx(full_graph)  
-            # plt.show()
+
             links = len(full_graph.edges)
             weights = list(get_edge_attributes(full_graph, 'weight').values())
             
@@ -144,12 +133,9 @@ for name in names:
             
             bcw = np.mean(bcsw)
             ccw = np.mean(ccsw)
-            # da = (nx.degree_assortativity_coefficient(synth))
-            # dia = (nx.diameter(synth))
-            # short = (nx.average_shortest_path_length(synth))
-            # graph_metrics = graph_metrics + [[links, weight,bc,bcw,dc,cc,ccw,bc2,bcw2,dc2,cc2,ccw2]]
+
             graph_metrics =  graph_metrics + [[k,links, sum(weights), bcw, ccw, ks_weights[0], ks_weights[1], ks_bcs[0], ks_bcs[1], ks_ccs[0], ks_ccs[1], ks_dcs[0], ks_dcs[1], ks_bcsw[0], ks_bcsw[1], ks_ccsw[0], ks_ccsw[1], bc, cc, dc, ad_weights[0], ad_weights[2], ad_bcs[0], ad_bcs[2], ad_ccs[0], ad_ccs[2], ad_dcs[0], ad_dcs[2], ad_bcsw[0], ad_bcsw[2], ad_ccsw[0], ad_ccsw[2]]]
-        #graph_metrics_df = pd.DataFrame(graph_metrics, columns=["Links", "Weights","BC", "BCW", "DC", "CC", "CCW","BC2", "BCW2", "DC2", "CC2", "CCW2"])
+      
         graph_metrics_df = pd.DataFrame(graph_metrics, columns=["i","Links","Weights","BCW","CCW","Stat_Weights","p-value_Weights","Stat_BC", "p-value_BC","Stat_CC", "p-value_CC","Stat_DC", "p-value_DC","Stat_BCW", "p-value_BCW","Stat_CCW", "p-value_CCW","BC","CC","DC","AD_Weights","p-value_Weights","AD_BC", "p-value_BC","AD_CC", "p-value_CC","AD_DC", "p-value_DC","AD_BCW", "p-value_BCW","AD_CCW", "p-value_CCW"])
         graph_metrics_df.to_csv("graph_metrics_"+algo+"_"+name+".csv",index=False,sep=";")
         
@@ -157,15 +143,10 @@ for name in names:
         print("BC " + str(np.mean(graph_metrics_df["BC"])))
         print("CC " + str(np.mean(graph_metrics_df["CC"])))
         print("DC " + str(np.mean(graph_metrics_df["DC"])))
-        print("BC std" + str(np.std(graph_metrics_df["BC"] )))
-        print("CC std" + str(np.std(graph_metrics_df["CC"] )))
-        print("DC std" + str(np.std(graph_metrics_df["DC"] )))     
+  
         print("BCW " + str(np.mean(graph_metrics_df["BCW"])))
         print("CCW " + str(np.mean(graph_metrics_df["CCW"])))
         
-        print("BCW std" + str(np.std(graph_metrics_df["BCW"] / np.mean(graph_metrics_df["BCW"]))))
-        print("CCW std" + str(np.std(graph_metrics_df["CCW"] / np.mean(graph_metrics_df["CCW"]))))
-        
-            
+
             
             

@@ -17,16 +17,19 @@ from scipy import stats
 from traditional import synth_BA, synth_ER, synth_WS, synth_2K
 import copy
 warnings.simplefilter(action='ignore')
+
+# https://stackoverflow.com/questions/28107939/assigning-networkx-edge-attributes-weights-to-a-dict
 def get_edge_attributes(G, name):
     edges = G.edges(data=True)
     return dict( (x[:-1], x[-1][name]) for x in edges if name in x[-1] )
 
+# fix seeds for reproduceability
 np.random.seed(0)
 python_random.seed(0)
 tf.random.set_seed(0)
 
 name = "BREN"
-clusters = 4
+clusters = 2
 graph_metrics = []
 algo ="2K"
 load = False
@@ -121,7 +124,6 @@ for k in range(1000):
                     
                     edges_to_add.append((node1[0], node2[0]   ))
         
-            #full_graph.add_edges_from(edges_to_add, weight =  random.choice(list(get_edge_attributes(full_graph, 'weight').values())))
             for edge_to_add in edges_to_add:
                 print(edge_to_add)
                 full_graph.add_edges_from([edge_to_add], weight = random.choice(list(get_edge_attributes(full_graph, 'weight').values())))
@@ -192,9 +194,3 @@ print("DC " + str(np.mean(graph_metrics_df["DC"])))
 
 print("BCW " + str(np.mean(graph_metrics_df["BCW"])))
 print("CCW " + str(np.mean(graph_metrics_df["CCW"])))
-
-        
-        
-        
-        
-        
