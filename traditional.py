@@ -5,28 +5,23 @@ Created on Fri May 20 14:05:13 2022
 @author: katha
 """
 
-
-import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 import random as python_random
 import copy
-import seaborn as sns
 import random
 import warnings
-import pandas as pd
 import networkx as nx
-import pickle
-from scipy import stats
 import scipy
-import pickle
-import os
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
+# https://stackoverflow.com/questions/28107939/assigning-networkx-edge-attributes-weights-to-a-dict
 def get_edge_attributes(G, name):
     edges = G.edges(data=True)
     return dict( (x[:-1], x[-1][name]) for x in edges if name in x[-1] )
 
+# fix seeds for reproduceability (not really necessary here as we just define functions here that call from other scripts)
 np.random.seed(0)
 python_random.seed(0)
 tf.random.set_seed(0)
@@ -70,22 +65,6 @@ def synth_ER(adj_matrix):
     for edge_to_add in edges_to_add:
         print(random.choice(list(get_edge_attributes(G, 'weight').values())))
         G.add_edges_from([edge_to_add],weight= random.choice(list(get_edge_attributes(G, 'weight').values())))
-    # while not nx.is_connected(G):
-    #     components = sorted(nx.connected_components(G), key=len, reverse=True)
-
-    #     rand_comps = random.sample(range(0, len(components)), 2)
-    #     print(rand_comps)
-    #     comp1 = components[rand_comps[0]]
-    #     comp2 = components[rand_comps[1]]
-    #     node1 = random.sample(comp1, 1)
-    #     node2 = random.sample(comp2, 1)
-    #     added_edges = added_edges +1 
-        
-    #     edges_to_add.append((node1[0], node2[0]   ))
-    #     edge_to_add = (node1[0], node2[0]   )
-    #     G.add_edges_from([edge_to_add], weight = random.choice(list(get_edge_attributes(G, 'weight').values())))
-        
-
     r = 0
     while r < added_edges and len(G.edges) >= len(G.nodes):
         edges = list(G.edges)
@@ -103,13 +82,10 @@ def synth_ER(adj_matrix):
 def synth_BA(adj_matrix):
     weights = adj_matrix[adj_matrix != 0]
     real = matrix_to_nx(adj_matrix)
-    #print(adj_matrix)
     n =  len(real.nodes)
 
     m=int(round(len(real.edges)/n))
 
-    # if m == 0:
-    #     m = 1
     np.max([m,1])
     G = nx.barabasi_albert_graph(n,m)
     for (u,v,w) in G.edges(data=True):
@@ -203,7 +179,6 @@ def synth_WS(adj_matrix):
 def synth_2K(adj_matrix, rewire = True):
 
     weights = adj_matrix[adj_matrix != 0]
-    #np.random.choice(weights)
     real = matrix_to_nx(adj_matrix)
     n = len(real.nodes)
     jdd = np.zeros(shape=(n,n))
@@ -225,11 +200,10 @@ def synth_2K(adj_matrix, rewire = True):
                 
         if not a_deg in jdd_dict:
             jdd_dict[a_deg] = {b_deg: 1 }
-            #jdd_dict[a_deg][b_deg] = {b_deg: 1}   
-    # print(jdd_dict)
-    # print("+++++")
+
+    # switch around a and b to count both directions
     for edge in list(real.edges):
-        b = edge[0] # switch around a and b to count both directions
+        b = edge[0]
         a = edge[1]
         a_deg = real.degree[a]
         b_deg = real.degree[b]
@@ -245,9 +219,7 @@ def synth_2K(adj_matrix, rewire = True):
                 
         if not a_deg in jdd_dict:
             jdd_dict[a_deg] = {b_deg: 1 }
-            #jdd_dict[a_deg][b_deg] = {b_deg: 1}   
-    # print(jdd_dict)
-    # print("#########")
+
     G = nx.joint_degree_graph(jdd_dict)
     
     for (u,v,w) in G.edges(data=True):
