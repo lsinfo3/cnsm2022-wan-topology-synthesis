@@ -29,7 +29,7 @@ python_random.seed(0)
 tf.random.set_seed(0)
 
 name = "BREN"
-clusters = 2
+clusters = 4
 graph_metrics = []
 algo ="2K"
 load = False
@@ -67,10 +67,12 @@ if clusters == 3:
     paths = [name+"_local_0_c3\\", name+"_local_1_c3\\", name+"_local_2_c3\\",name+"_global_c3\\"]
 if clusters == 2:
     paths = [name+"_local_0_c2\\", name+"_local_1_c2\\", name+"_global_c2\\"]
+    
 for k in range(1000):
     full_graph = nx.Graph()
     network__parts = []
     for path in paths:
+        path = name + "_hierarchical/" + path
         if load == True:
             print("Skip synthesizing and load already synthesized topologies.")
             continue
@@ -111,6 +113,8 @@ for k in range(1000):
         full_graph = nx.compose(full_graph,synth)
     
     if "global" in path:
+        
+            ######## REWIRE ########
             edges_to_add = []
             added_edges = 0
             components = sorted(nx.connected_components(full_graph), key=len, reverse=True)
@@ -120,12 +124,10 @@ for k in range(1000):
                     comp2 = components[j+1]
                     node1 = random.sample(comp1, 1)
                     node2 = random.sample(comp2, 1)
-                    added_edges = added_edges +1 
-                    
-                    edges_to_add.append((node1[0], node2[0]   ))
+                    added_edges = added_edges + 1                    
+                    edges_to_add.append((node1[0], node2[0]))
         
             for edge_to_add in edges_to_add:
-                print(edge_to_add)
                 full_graph.add_edges_from([edge_to_add], weight = random.choice(list(get_edge_attributes(full_graph, 'weight').values())))
             
             r = 0
@@ -137,18 +139,16 @@ for k in range(1000):
                 if nx.is_connected(testing_graph):
                     full_graph.remove_edge(chosen_edge[0], chosen_edge[1])
                     r = r + 1
-                    print("Succesfully rewired Graph.")
-
+           ########################
+          
     matrix_norm = nx.to_numpy_array(full_graph)
     full_graph = nx.Graph(matrix_norm)
             
     if (save == True):
-        print("Sample saved.")
         with open(path +"/synth_sample_"+algo+"_"+str(k)+".pkl","wb") as f:
             pickle.dump(full_graph,f)
     
     if (load == True):
-        print("Sample loaded.")
         with open(path +"/synth_sample_"+algo+"_"+str(k)+".pkl","rb") as f:
             full_graph = pickle.load(f)
     

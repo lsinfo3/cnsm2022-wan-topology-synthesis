@@ -32,12 +32,12 @@ python_random.seed(0)
 tf.random.set_seed(0)
 
 name = "BREN"
-clusters = 2
+clusters = 4
 graph_metrics = []
 load = False
-save = False
-sample_weights = False
-color = "RGB"
+save = True
+sample_weights = True
+color = "BW"
 
 adj_matrix_real = np.loadtxt("adj_matrices\\"+name+"_weighted.txt")
 maximum_dist = np.max(adj_matrix_real)
@@ -70,13 +70,13 @@ if clusters == 3:
 if clusters == 2:
     paths = [name+"_local_0_c2\\", name+"_local_1_c2\\", name+"_global_c2\\"]
 
+
 for k in range(100):    
     for s in range(10):
         full_graph = nx.Graph() # new graph where components are added one by one
         for path in paths:
-            # print(path)
+            path = name + "_hierarchical/" + path
             if load == True:
-                print("Skip synthesizing and load already synthesized topologies.")
                 continue
             nodes = np.loadtxt(path + "nodes.txt")
     
@@ -142,6 +142,8 @@ for k in range(100):
                     # if local in path we basically do it the same like in the flat approach, load partial matrix and rewire if not connected
                     # as we know the local views have to be connected
                     if "local" in path:
+                        
+                        ######## REWIRE ########
                         edges_to_add = []
                         added_edges = 0
                         components = sorted(nx.connected_components(synth), key=len, reverse=True)
@@ -160,7 +162,6 @@ for k in range(100):
                             synth.add_edges_from(edges_to_add, weight = 1)
                         else:
                             for edge_to_add in edges_to_add:
-                                # print(edge_to_add)
                                 synth.add_edges_from([edge_to_add], weight = random.choice(list(get_edge_attributes(synth, 'weight').values())))
                             
 
@@ -173,12 +174,12 @@ for k in range(100):
                             if nx.is_connected(testing_graph):
                                 synth.remove_edge(chosen_edge[0], chosen_edge[1])
                                 r = r + 1
-                                # print("Succesfully rewired Graph.")
+                                
+                        ########################
                     
                 else: # if BW
 
                     if sample_weights:
-                        # print("Sampling weights.")
                         weights = partial_weights
                         extracted_weighted = np.asarray(np.zeros(shape=(len(adj_matrix),len(adj_matrix),1)))
 
@@ -201,6 +202,8 @@ for k in range(100):
                     # if local in path we basically do it the same like in the flat approach, load partial matrix and rewire if not connected
                     # as we know the local views have to be connected
                     if "local" in path:
+                        
+                        ######## REWIRE ########
                         edges_to_add = []
                         added_edges = 0
                         components = sorted(nx.connected_components(synth), key=len, reverse=True)
@@ -210,20 +213,16 @@ for k in range(100):
                                     comp2 = components[j+1]
                                     node1 = random.sample(comp1, 1)
                                     node2 = random.sample(comp2, 1)
-                                    added_edges = added_edges +1 
+                                    added_edges = added_edges + 1 
                                     
-                                    edges_to_add.append((node1[0], node2[0]   ))
+                                    edges_to_add.append((node1[0], node2[0]))
             
             
                         if sample_weights:
                             if len(extracted_weighted[extracted_weighted>0]) == 0: # shouldn't be the case 
-                                # plt.imshow(adj_matrix)
-                                # plt.show()
-                                # print(adj_matrix)
                                 synth.add_edges_from(edges_to_add, weight = 1)
                             else:
                                 for edge_to_add in edges_to_add:
-                                    # print(edge_to_add)
                                     synth.add_edges_from([edge_to_add], weight = random.choice(list(get_edge_attributes(synth, 'weight').values())))
                             
                         else: 
@@ -238,7 +237,7 @@ for k in range(100):
                             if nx.is_connected(testing_graph):
                                 synth.remove_edge(chosen_edge[0], chosen_edge[1])
                                 r = r + 1
-                                # print("Succesfully rewired Graph.")
+                        ########################
                
                 
                 full_graph = nx.compose(full_graph,synth) # add component to graph
@@ -247,6 +246,8 @@ for k in range(100):
         # remember: only the local view have been rewired to be connected
         # as the global view is not necessarily connected -> rewire only after global view is added and graph still disconnected
         if "global" in path:
+            
+            ######## REWIRE ########
             edges_to_add = []
             added_edges = 0
             components = sorted(nx.connected_components(full_graph), key=len, reverse=True)
@@ -257,21 +258,18 @@ for k in range(100):
                         comp2 = components[j+1]
                         node1 = random.sample(comp1, 1)
                         node2 = random.sample(comp2, 1)
-                        added_edges = added_edges +1 
-                        
-                        edges_to_add.append((node1[0], node2[0]   ))
+                        added_edges = added_edges + 1 
+                        edges_to_add.append((node1[0], node2[0]))
     
     
             if len(extracted_weighted[extracted_weighted>0]) == 0:
                 full_graph.add_edges_from(edges_to_add, weight = 1)
             elif color == "BW" and sample_weights:
                 for edge_to_add in edges_to_add:
-                    # print(edge_to_add)
                     full_graph.add_edges_from([edge_to_add], weight = random.choice(list(get_edge_attributes(full_graph, 'weight').values())))
                 
             elif color == "RGB":
                 for edge_to_add in edges_to_add:
-                    # print(edge_to_add)
                     full_graph.add_edges_from([edge_to_add], weight = random.choice(list(get_edge_attributes(full_graph, 'weight').values())))
             
             elif color == "BW" and not sample_weights:  
@@ -287,19 +285,17 @@ for k in range(100):
                 if nx.is_connected(testing_graph):
                     full_graph.remove_edge(chosen_edge[0], chosen_edge[1])
                     r = r + 1
-                    # print("Succesfully rewired Graph.")
+            ########################
                     
     
         matrix_norm = nx.to_numpy_array(full_graph)
         full_graph = nx.Graph(matrix_norm)
         
         if (save == True):
-            print("Sample saved.")
             with open(path +"/synth_sample_"+str(k)+"_"+str(s)+"_"+color+"_"+str(int(sample_weights == True))+"_.pkl","wb") as f:
                 pickle.dump(full_graph,f)
         
         if (load == True):
-            print("Sample loaded.")
             with open(path +"/synth_sample_"+str(k)+"_"+str(s)+"_"+color+"_"+str(int(sample_weights == True))+"_.pkl","rb") as f:
                 full_graph = pickle.load(f)
         
@@ -338,7 +334,7 @@ for k in range(100):
         graph_metrics =  graph_metrics + [[k,links, sum(weights), bcw, ccw, ks_weights[0], ks_weights[1], ks_bcs[0], ks_bcs[1], ks_ccs[0], ks_ccs[1], ks_dcs[0], ks_dcs[1], ks_bcsw[0], ks_bcsw[1], ks_ccsw[0], ks_ccsw[1], bc, cc, dc, ad_weights[0], ad_weights[2], ad_bcs[0], ad_bcs[2], ad_ccs[0], ad_ccs[2], ad_dcs[0], ad_dcs[2], ad_bcsw[0], ad_bcsw[2], ad_ccsw[0], ad_ccsw[2]]]
        
 graph_metrics_df = pd.DataFrame(graph_metrics, columns=["i","Links","Weights","BCW","CCW","Stat_Weights","p-value_Weights","Stat_BC", "p-value_BC","Stat_CC", "p-value_CC","Stat_DC", "p-value_DC","Stat_BCW", "p-value_BCW","Stat_CCW", "p-value_CCW","BC","CC","DC","AD_Weights","p-value_Weights","AD_BC", "p-value_BC","AD_CC", "p-value_CC","AD_DC", "p-value_DC","AD_BCW", "p-value_BCW","AD_CCW", "p-value_CCW"])
-#graph_metrics_df.to_csv("graph_metrics_"+name+"_"+str(clusters)+".csv",index=False,sep=";")
+
 if sample_weights:
     graph_metrics_df.to_csv("graph_metrics_"+name+"_hybrid"+"_"+str(clusters)+".csv",index=False,sep=";")
 elif color == "BW":

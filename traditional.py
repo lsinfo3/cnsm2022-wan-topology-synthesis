@@ -45,10 +45,12 @@ def synth_ER(adj_matrix):
     n = len(real.nodes)
     fully_meshed = scipy.special.binom(n, 2)
     p = len(real.edges)/fully_meshed
-
     G=nx.erdos_renyi_graph(n,p)
+    
     for (u,v,w) in G.edges(data=True):
         w['weight'] = np.random.choice(weights)
+        
+    ######## REWIRE ########
     edges_to_add = []
     added_edges = 0
     components = sorted(nx.connected_components(G), key=len, reverse=True)
@@ -58,13 +60,12 @@ def synth_ER(adj_matrix):
             comp2 = components[j+1]
             node1 = random.sample(comp1, 1)
             node2 = random.sample(comp2, 1)
-            added_edges = added_edges +1 
-            
-            edges_to_add.append((node1[0], node2[0]   ))
+            added_edges = added_edges + 1       
+            edges_to_add.append((node1[0], node2[0]))
 
     for edge_to_add in edges_to_add:
-        print(random.choice(list(get_edge_attributes(G, 'weight').values())))
         G.add_edges_from([edge_to_add],weight= random.choice(list(get_edge_attributes(G, 'weight').values())))
+        
     r = 0
     while r < added_edges and len(G.edges) >= len(G.nodes):
         edges = list(G.edges)
@@ -74,8 +75,8 @@ def synth_ER(adj_matrix):
         if nx.is_connected(testing_graph):
             G.remove_edge(chosen_edge[0], chosen_edge[1])
             r = r + 1
-            print("Succesfully rewired Graph.")
-
+    ########################
+    
     return G
      
       
@@ -83,13 +84,14 @@ def synth_BA(adj_matrix):
     weights = adj_matrix[adj_matrix != 0]
     real = matrix_to_nx(adj_matrix)
     n =  len(real.nodes)
-
     m=int(round(len(real.edges)/n))
-
     np.max([m,1])
     G = nx.barabasi_albert_graph(n,m)
+    
     for (u,v,w) in G.edges(data=True):
         w['weight'] = np.random.choice(weights)
+        
+    ######## REWIRE ########
     edges_to_add = []
     added_edges = 0
     components = sorted(nx.connected_components(G), key=len, reverse=True)
@@ -99,15 +101,12 @@ def synth_BA(adj_matrix):
             comp2 = components[j+1]
             node1 = random.sample(comp1, 1)
             node2 = random.sample(comp2, 1)
-            added_edges = added_edges +1 
-            
-            edges_to_add.append((node1[0], node2[0]   ))
+            added_edges = added_edges + 1         
+            edges_to_add.append((node1[0], node2[0]))
 
     for edge_to_add in edges_to_add:
-        print(random.choice(list(get_edge_attributes(G, 'weight').values())))
         G.add_edges_from([edge_to_add],weight= random.choice(list(get_edge_attributes(G, 'weight').values())))
-        
-    
+          
     r = 0
     while r < added_edges and len(G.edges) >= len(G.nodes):
         edges = list(G.edges)
@@ -117,7 +116,7 @@ def synth_BA(adj_matrix):
         if nx.is_connected(testing_graph):
             G.remove_edge(chosen_edge[0], chosen_edge[1])
             r = r + 1
-            print("Succesfully rewired Graph.")
+    ########################
 
     return G
 
@@ -126,9 +125,6 @@ def synth_WS(adj_matrix):
     weights = adj_matrix[adj_matrix != 0]
     real = matrix_to_nx(adj_matrix)
     n = len(real.nodes)
-    
-
-    
     k = int(round(len(real.edges)/(n/2)))
     k = np.max([k, 2])
     
@@ -141,8 +137,11 @@ def synth_WS(adj_matrix):
             k = k+1
     
     G = nx.watts_strogatz_graph(n,k,0.2)
+    
     for (u,v,w) in G.edges(data=True):
         w['weight'] = np.random.choice(weights)
+        
+    ######## REWIRE ########
     edges_to_add = []
     added_edges = 0
     components = sorted(nx.connected_components(G), key=len, reverse=True)
@@ -152,15 +151,12 @@ def synth_WS(adj_matrix):
             comp2 = components[j+1]
             node1 = random.sample(comp1, 1)
             node2 = random.sample(comp2, 1)
-            added_edges = added_edges +1 
-            
-            edges_to_add.append((node1[0], node2[0]   ))
+            added_edges = added_edges + 1      
+            edges_to_add.append((node1[0], node2[0]))
 
     for edge_to_add in edges_to_add:
-        print(random.choice(list(get_edge_attributes(G, 'weight').values())))
         G.add_edges_from([edge_to_add],weight= random.choice(list(get_edge_attributes(G, 'weight').values())))
         
-
     r = 0
     while r < added_edges and len(G.edges) >= len(G.nodes):
         edges = list(G.edges)
@@ -170,14 +166,11 @@ def synth_WS(adj_matrix):
         if nx.is_connected(testing_graph):
             G.remove_edge(chosen_edge[0], chosen_edge[1])
             r = r + 1
-            print("Succesfully rewired Graph.")
-    
-
-        
+    ########################
+ 
     return G
 
 def synth_2K(adj_matrix, rewire = True):
-
     weights = adj_matrix[adj_matrix != 0]
     real = matrix_to_nx(adj_matrix)
     n = len(real.nodes)
@@ -225,6 +218,7 @@ def synth_2K(adj_matrix, rewire = True):
     for (u,v,w) in G.edges(data=True):
         w['weight'] = np.random.choice(weights)
     
+    ######## REWIRE ########
     if rewire:
         edges_to_add = []
         added_edges = 0
@@ -235,12 +229,10 @@ def synth_2K(adj_matrix, rewire = True):
                 comp2 = components[j+1]
                 node1 = random.sample(comp1, 1)
                 node2 = random.sample(comp2, 1)
-                added_edges = added_edges +1 
-                
-                edges_to_add.append((node1[0], node2[0]   ))
+                added_edges = added_edges + 1 
+                edges_to_add.append((node1[0], node2[0]))
 
         for edge_to_add in edges_to_add:
-            print(random.choice(list(get_edge_attributes(G, 'weight').values())))
             G.add_edges_from([edge_to_add],weight= random.choice(list(get_edge_attributes(G, 'weight').values())))
         
         r = 0
@@ -252,6 +244,6 @@ def synth_2K(adj_matrix, rewire = True):
             if nx.is_connected(testing_graph):
                 G.remove_edge(chosen_edge[0], chosen_edge[1])
                 r = r + 1
-                print("Succesfully rewired Graph.")
+    ########################
     
     return G

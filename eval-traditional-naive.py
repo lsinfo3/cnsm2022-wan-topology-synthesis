@@ -29,10 +29,9 @@ algos = ["2K", "BA", "ER", "WS"]
 load = False
 save = True
 for name in names:
-
     for algo in algos:
-        print(algo)
-        print(name)
+        
+        # set seed for every algo, so that loop iterations a not dependent in terms of random numbers...
         np.random.seed(0)
         python_random.seed(0)
         tf.random.set_seed(0)
@@ -64,14 +63,6 @@ for name in names:
         
         bcw_real = np.mean(bcsw_real)
         ccw_real = np.mean(ccsw_real)
-        
-        print(sum(weights_real))
-        print("BC" + str(bc_real))
-        print("CC" + str(cc_real))
-        print("DC" + str(dc_real))
-        print(bcw_real)
-        print(ccw_real)
-        
         
         path = name+"_naive/"
         

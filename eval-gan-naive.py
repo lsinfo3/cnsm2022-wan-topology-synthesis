@@ -102,7 +102,7 @@ for k in range(100):
                             extracted_unweighted[i][j][0] = 0.0 # no self-loops
                 
                 if adj_matrix.shape == (nr_nodes, nr_nodes, 3): # if we have an RGB image, i.e., 3 colorchannels
-                    print("RGB")
+                    
                     extracted_weighted = np.asarray(np.zeros(shape=(len(adj_matrix),len(adj_matrix),1)))
                     for i in range(len(extracted_unweighted)):
                         for j in range(len(extracted_unweighted)):
@@ -115,6 +115,7 @@ for k in range(100):
                     extracted_weighted = np.squeeze(extracted_weighted)
                     full_graph = nx.Graph(extracted_weighted,data = True)
                     
+                    ######## REWIRE ########
                     edges_to_add = [] # rewire the graph so that is connected
                     added_edges = 0
                     components = sorted(nx.connected_components(full_graph), key=len, reverse=True) # connect all smaller components/isolated nodes to the biggest component
@@ -141,12 +142,10 @@ for k in range(100):
                         if nx.is_connected(testing_graph):
                             full_graph.remove_edge(chosen_edge[0], chosen_edge[1])
                             r = r + 1
-                            print("Succesfully rewired Graph.")
+                    ########################
 
                 else: # if we have BW image
-                    print("BW")
                     if sample_weights: # if we want to sample on weights onto BW image
-                        print("Sampling weights.")
                         weights = adj_matrix_real[adj_matrix_real != 0] # get list of real weights from real matrix
                         extracted_weighted = np.asarray(np.zeros(shape=(len(adj_matrix),len(adj_matrix),1)))
                         for i in range(len(extracted_unweighted)):
@@ -162,6 +161,7 @@ for k in range(100):
                         full_graph = nx.Graph(extracted_unweighted,data = True)
                     
 		            # now rewire again (same as for RGB)
+                    ######## REWIRE ########
                     edges_to_add = []
                     added_edges = 0
                     components = sorted(nx.connected_components(full_graph), key=len, reverse=True)
@@ -171,9 +171,9 @@ for k in range(100):
                             comp2 = components[j+1]
                             node1 = random.sample(comp1, 1)
                             node2 = random.sample(comp2, 1)
-                            added_edges = added_edges +1 
+                            added_edges = added_edges + 1 
                             
-                            edges_to_add.append((node1[0], node2[0]   ))
+                            edges_to_add.append((node1[0], node2[0]))
     
                     if sample_weights:          
                         for edge_to_add in edges_to_add:
@@ -191,15 +191,13 @@ for k in range(100):
                         if nx.is_connected(testing_graph):
                             full_graph.remove_edge(chosen_edge[0], chosen_edge[1])
                             r = r + 1
-                            print("Succesfully rewired Graph.")
+                   ########################
                             
         if (save == True):
-            print("Sample saved.")
             with open(path +"/synth_sample_"+str(k)+"_"+str(s)+"_"+color+"_"+str(int(sample_weights == True))+"_.pkl","wb") as f:
                 pickle.dump(full_graph,f)
         
         if (load == True):
-            print("Sample loaded.")
             with open(path +"/synth_sample_"+str(k)+"_"+str(s)+"_"+color+"_"+str(int(sample_weights == True))+"_.pkl","rb") as f:
                 full_graph = pickle.load(f)
         
@@ -236,7 +234,9 @@ for k in range(100):
         ccw = np.mean(ccsw)
 
         graph_metrics =  graph_metrics + [[ k,links, sum(weights), bcw, ccw, ks_weights[0], ks_weights[1], ks_bcs[0], ks_bcs[1], ks_ccs[0], ks_ccs[1], ks_dcs[0], ks_dcs[1], ks_bcsw[0], ks_bcsw[1], ks_ccsw[0], ks_ccsw[1], bc, cc, dc, ad_weights[0], ad_weights[2], ad_bcs[0], ad_bcs[2], ad_ccs[0], ad_ccs[2], ad_dcs[0], ad_dcs[2], ad_bcsw[0], ad_bcsw[2], ad_ccsw[0], ad_ccsw[2]]]
+
 graph_metrics_df = pd.DataFrame(graph_metrics, columns=["i","Links","Weights","BCW","CCW","Stat_Weights","p-value_Weights","Stat_BC", "p-value_BC","Stat_CC", "p-value_CC","Stat_DC", "p-value_DC","Stat_BCW", "p-value_BCW","Stat_CCW", "p-value_CCW","BC","CC","DC","AD_Weights","p-value_Weights","AD_BC", "p-value_BC","AD_CC", "p-value_CC","AD_DC", "p-value_DC","AD_BCW", "p-value_BCW","AD_CCW", "p-value_CCW"])
+
 if sample_weights:
     graph_metrics_df.to_csv("graph_metrics_"+name+"_hybrid.csv",index=False,sep=";")
 elif color == "BW":
