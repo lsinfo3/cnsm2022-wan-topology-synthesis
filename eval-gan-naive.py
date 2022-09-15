@@ -35,7 +35,7 @@ tf.random.set_seed(0)
 name = "BREN" # one of GEANT2001, BREN, BTNORTHAMERICA, GTSSLOVAKIA
 graph_metrics = []
 load = False
-save = True
+save = False
 sample_weights = False
 color = "RGB"
 
@@ -106,7 +106,7 @@ for k in range(100):
                     extracted_weighted = np.asarray(np.zeros(shape=(len(adj_matrix),len(adj_matrix),1)))
                     for i in range(len(extracted_unweighted)):
                         for j in range(len(extracted_unweighted)):
-                            avg_dist =  (adj_matrix[i][j][1] +  adj_matrix[i][j][1])/2 # link weight as average of the symmetric entries, if the decided above that the link exists
+                            avg_dist =  (adj_matrix[i][j][1] +  adj_matrix[j][i][1])/2 # link weight as average of the symmetric entries, if the decided above that the link exists                           
                             if extracted_unweighted[i][j][0] ==1.0 and extracted_unweighted[j][i][0] ==1.0:
                                 extracted_weighted[i][j][0] = np.max([avg_dist, 1/maximum_dist]) # 1 is the minimum distance, so we can cap it off there/smooth it out
                                 extracted_weighted[j][i][0] = np.max([avg_dist, 1/maximum_dist])

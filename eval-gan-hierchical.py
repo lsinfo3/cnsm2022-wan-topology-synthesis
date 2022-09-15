@@ -32,12 +32,12 @@ python_random.seed(0)
 tf.random.set_seed(0)
 
 name = "BREN"
-clusters = 4
+clusters = 2
 graph_metrics = []
 load = False
 save = True
-sample_weights = True
-color = "BW"
+sample_weights = False
+color = "RGB"
 
 adj_matrix_real = np.loadtxt("adj_matrices\\"+name+"_weighted.txt")
 maximum_dist = np.max(adj_matrix_real)
@@ -127,7 +127,7 @@ for k in range(100):
                     for i in range(len(extracted_unweighted)):
                         for j in range(len(extracted_unweighted)):
                             # take avg dist. if linke exists
-                            avg_dist =  (adj_matrix[i][j][1] +  adj_matrix[i][j][1])/2
+                            avg_dist =  (adj_matrix[i][j][1] +  adj_matrix[j][i][1])/2
                             if extracted_unweighted[i][j][0] == 1.0 and extracted_unweighted[j][i][0] ==1.0:
                                 extracted_weighted[i][j][0] = np.max([avg_dist, 1/real_max_dist])
                                 extracted_weighted[j][i][0] = np.max([avg_dist, 1/real_max_dist])
