@@ -126,13 +126,11 @@ def synth_WS(adj_matrix):
     real = matrix_to_nx(adj_matrix)
     n = len(real.nodes)
     k = int(round(len(real.edges)/(n/2)))
-    k = np.max([k, 2])
-    
+    k = np.max([k, 2]) # maximum of two, 1 will be 0, and 0 makes no sense
+    print(len(real.edges))
     if k%2 != 0:
-        exp_edges = n*(k-1)
-        exp_edges_alternative = n*(k+1)
-        print(exp_edges)
-        print(exp_edges_alternative)
+        exp_edges = n*(k-1)/2
+        exp_edges_alternative = n*(k+1)/2
         if np.abs(len(real.edges) - exp_edges) > np.abs(len(real.edges) - exp_edges_alternative):
             k = k+1
     
