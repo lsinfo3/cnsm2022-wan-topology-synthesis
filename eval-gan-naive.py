@@ -39,28 +39,36 @@ save = False
 sample_weights = False
 color = "RGB"
 
+# load real matrix from adj_matrices folder
 adj_matrix_real = np.loadtxt("adj_matrices\\"+name+"_weighted.txt")
 maximum_dist = np.max(adj_matrix_real)
 
+####### plotting the weighted and unweighted adjancency matrices #######
 perm_unweighted = copy.deepcopy(adj_matrix_real)
 perm_unweighted[perm_unweighted > 0]=1
 
 network_size = len(perm_unweighted)
 
+# RGB
 rgb = np.stack((np.asarray((perm_unweighted)),np.asarray((adj_matrix_real/maximum_dist))), axis=-1)
-rgb=np.dstack((np.asarray(rgb),np.asarray(np.zeros(shape=(network_size,network_size,1)))))
+rgb = np.dstack((np.asarray(rgb),np.asarray(np.zeros(shape=(network_size,network_size,1)))))
 plt.tick_params(axis='both', which='both', bottom=False, top=False, labelbottom=False, right=False, left=False, labelleft=False)
 plt.imshow(rgb)
 plt.savefig(name+'_rgb.pdf',bbox_inches='tight',pad_inches=0.1)
 plt.show()
+
+# BW
 plt.tick_params(axis='both', which='both', bottom=False, top=False, labelbottom=False, right=False, left=False, labelleft=False)
 plt.imshow(perm_unweighted, cmap='gray_r')
 plt.savefig(name+'_bw.pdf',bbox_inches='tight',pad_inches=0.1)
 plt.show()
+############################
+
+
 real = nx.Graph(np.squeeze(adj_matrix_real),data = True)
 
+####### graph metrics of real network #######
 links_real = len(real.edges)
-
 weights_real = list(get_edge_attributes(real, 'weight').values())
 
 bcs_real = list(nx.betweenness_centrality(real).values())
@@ -76,6 +84,7 @@ dc_real = np.mean(dcs_real)
 
 bcw_real = np.mean(bcsw_real)
 ccw_real = np.mean(ccsw_real)
+##########################################
 
 path = name+"_naive\\"
 
@@ -201,7 +210,7 @@ for k in range(100):
             with open(path +"/synth_sample_"+str(k)+"_"+str(s)+"_"+color+"_"+str(int(sample_weights == True))+"_.pkl","rb") as f:
                 full_graph = pickle.load(f)
         
-        
+        ####### graph metrics of synthetic network #######
         links = len(full_graph.edges)
         weights = list(get_edge_attributes(full_graph, 'weight').values())
         
@@ -212,6 +221,7 @@ for k in range(100):
         bcsw = list(nx.betweenness_centrality(full_graph,weight='weight').values())
         ccsw = list(nx.closeness_centrality(full_graph, distance = 'weight').values())
         
+        # Kolgomorov-Smirnov test real vs synth
         ks_weights = (stats.ks_2samp(weights_real, weights))
         ks_bcs = (stats.ks_2samp(bcs_real, bcs))
         ks_ccs = (stats.ks_2samp(ccs_real, ccs))
@@ -219,6 +229,7 @@ for k in range(100):
         ks_bcsw = (stats.ks_2samp(bcsw_real, bcsw))
         ks_ccsw = (stats.ks_2samp(ccsw_real, ccs))
         
+        # Anderson-Darling test real vs synth
         ad_weights = (stats.anderson_ksamp([weights_real, weights]))
         ad_bcs = (stats.anderson_ksamp([bcs_real, bcs]))
         ad_ccs = (stats.anderson_ksamp([ccs_real, ccs]))
@@ -232,7 +243,8 @@ for k in range(100):
         
         bcw = np.mean(bcsw)
         ccw = np.mean(ccsw)
-
+        ##########################################
+        
         graph_metrics =  graph_metrics + [[ k,links, sum(weights), bcw, ccw, ks_weights[0], ks_weights[1], ks_bcs[0], ks_bcs[1], ks_ccs[0], ks_ccs[1], ks_dcs[0], ks_dcs[1], ks_bcsw[0], ks_bcsw[1], ks_ccsw[0], ks_ccsw[1], bc, cc, dc, ad_weights[0], ad_weights[2], ad_bcs[0], ad_bcs[2], ad_ccs[0], ad_ccs[2], ad_dcs[0], ad_dcs[2], ad_bcsw[0], ad_bcsw[2], ad_ccsw[0], ad_ccsw[2]]]
 
 graph_metrics_df = pd.DataFrame(graph_metrics, columns=["i","Links","Weights","BCW","CCW","Stat_Weights","p-value_Weights","Stat_BC", "p-value_BC","Stat_CC", "p-value_CC","Stat_DC", "p-value_DC","Stat_BCW", "p-value_BCW","Stat_CCW", "p-value_CCW","BC","CC","DC","AD_Weights","p-value_Weights","AD_BC", "p-value_BC","AD_CC", "p-value_CC","AD_DC", "p-value_DC","AD_BCW", "p-value_BCW","AD_CCW", "p-value_CCW"])

@@ -10,7 +10,7 @@ import numpy as np
 import networkx as nx
 from wangan import WANGAN
 
-name = "BREN"
+name = "BREN" # one of GEANT2001, BREN, BTNORTHAMERICA, GTSSLOVAKIA
 path = name + "_naive"
 isExist = os.path.exists(path)
 if not isExist:

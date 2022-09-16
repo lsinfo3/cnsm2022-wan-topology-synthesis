@@ -5,18 +5,10 @@ Created on Fri Mar  4 16:20:40 2022
 @author: katha
 """
 
-import networkx as nx
 import os
 import numpy as np
-import itertools
-import random
-import matplotlib.pyplot as plt
 import re
-import copy
 archive = "networks/"
-
-networks = []
-networks_sizes = []
 
 for file in os.listdir(archive):
     if file.endswith("KN.ned"): # could also use HF.ned, does not matter as they are identical.
@@ -24,8 +16,6 @@ for file in os.listdir(archive):
         fin = open(network_path, "rt")
         data = fin.read()
         fin.close()
-
-        
 
         connections = re.split(r"connections allowunconnected:", data)[1] # just adhering to the normal .ned file structure in the OOS and cut off some unnecessary data
         nodes = len(set(re.findall(r"ofs_[0-9]+", data))) # node nomenclature in the .ned files
@@ -40,6 +30,7 @@ for file in os.listdir(archive):
 
 	        # existing link with 0 geographical distance nonsensical (-> 0 means either identical node or no connection...), just set it to 1 (minimum distance, as all distances in this subset are integers). 
 	        # otherwise could maybe potentially lead to problems with calculations with graph metrics i.e. divisions by zero (?) or at least just really really high values for e.g. closeness, also just in general makes life easier for us (e.g. distinguishing between existing links in weighted adj. matrix when processing.)
+            # also NetworkX has problems for zero-weights for betweenness according to documentation
             distance = int(re.findall(r"[0-9]+",split[1])[0])
             # distance = np.max(1,distance)
             if distance == 0: 

@@ -31,21 +31,21 @@ np.random.seed(0)
 python_random.seed(0)
 tf.random.set_seed(0)
 
-name = "BREN"
-clusters = 2
+name = "BREN" # one of GEANT2001, BREN, BTNORTHAMERICA, GTSSLOVAKIA
+clusters = 2 # 2,3,4
 graph_metrics = []
 load = False
 save = True
 sample_weights = False
 color = "RGB"
 
+# load real matrix from adj_matrices folder
 adj_matrix_real = np.loadtxt("adj_matrices\\"+name+"_weighted.txt")
 maximum_dist = np.max(adj_matrix_real)
-
 real = nx.Graph(np.squeeze(adj_matrix_real),data = True)
 
+####### graph metrics of real network #######
 links_real = len(real.edges)
-
 weights_real = list(get_edge_attributes(real, 'weight').values())
 
 bcs_real = list(nx.betweenness_centrality(real).values())
@@ -61,15 +61,14 @@ dc_real = np.mean(dcs_real)
 
 bcw_real = np.mean(bcsw_real)
 ccw_real = np.mean(ccsw_real)
+##########################################
 
 if clusters == 4:
     paths = [name+"_local_0_c4\\", name+"_local_1_c4\\", name+"_local_2_c4\\", name+"_local_3_c4\\",name+"_global_c4\\"]
 if clusters == 3:
     paths = [name+"_local_0_c3\\", name+"_local_1_c3\\", name+"_local_2_c3\\",name+"_global_c3\\"]
-
 if clusters == 2:
     paths = [name+"_local_0_c2\\", name+"_local_1_c2\\", name+"_global_c2\\"]
-
 
 for k in range(100):    
     for s in range(10):
@@ -173,8 +172,7 @@ for k in range(100):
                             testing_graph.remove_edge(chosen_edge[0], chosen_edge[1])
                             if nx.is_connected(testing_graph):
                                 synth.remove_edge(chosen_edge[0], chosen_edge[1])
-                                r = r + 1
-                                
+                                r = r + 1                                
                         ########################
                     
                 else: # if BW
@@ -214,7 +212,6 @@ for k in range(100):
                                     node1 = random.sample(comp1, 1)
                                     node2 = random.sample(comp2, 1)
                                     added_edges = added_edges + 1 
-                                    
                                     edges_to_add.append((node1[0], node2[0]))
             
             
@@ -262,7 +259,7 @@ for k in range(100):
                         edges_to_add.append((node1[0], node2[0]))
     
     
-            if len(extracted_weighted[extracted_weighted>0]) == 0:
+            if len(extracted_weighted[extracted_weighted>0]) == 0: # shouldn't happen
                 full_graph.add_edges_from(edges_to_add, weight = 1)
             elif color == "BW" and sample_weights:
                 for edge_to_add in edges_to_add:
@@ -299,7 +296,7 @@ for k in range(100):
             with open(path +"/synth_sample_"+str(k)+"_"+str(s)+"_"+color+"_"+str(int(sample_weights == True))+"_.pkl","rb") as f:
                 full_graph = pickle.load(f)
         
-        
+        ####### graph metrics of synthetic network #######
         links = len(full_graph.edges)
         weights = list(get_edge_attributes(full_graph, 'weight').values())
         
@@ -310,6 +307,7 @@ for k in range(100):
         bcsw = list(nx.betweenness_centrality(full_graph,weight='weight').values())
         ccsw = list(nx.closeness_centrality(full_graph, distance = 'weight').values())
         
+        # Kolgomorov-Smirnov test real vs synth
         ks_weights = (stats.ks_2samp(weights_real, weights))
         ks_bcs = (stats.ks_2samp(bcs_real, bcs))
         ks_ccs = (stats.ks_2samp(ccs_real, ccs))
@@ -317,6 +315,7 @@ for k in range(100):
         ks_bcsw = (stats.ks_2samp(bcsw_real, bcsw))
         ks_ccsw = (stats.ks_2samp(ccsw_real, ccs))
         
+        # Anderson-Darling test real vs synth
         ad_weights = (stats.anderson_ksamp([weights_real, weights]))
         ad_bcs = (stats.anderson_ksamp([bcs_real, bcs]))
         ad_ccs = (stats.anderson_ksamp([ccs_real, ccs]))
@@ -330,11 +329,13 @@ for k in range(100):
         
         bcw = np.mean(bcsw)
         ccw = np.mean(ccsw)
-    
+        ##########################################
+        
         graph_metrics =  graph_metrics + [[k,links, sum(weights), bcw, ccw, ks_weights[0], ks_weights[1], ks_bcs[0], ks_bcs[1], ks_ccs[0], ks_ccs[1], ks_dcs[0], ks_dcs[1], ks_bcsw[0], ks_bcsw[1], ks_ccsw[0], ks_ccsw[1], bc, cc, dc, ad_weights[0], ad_weights[2], ad_bcs[0], ad_bcs[2], ad_ccs[0], ad_ccs[2], ad_dcs[0], ad_dcs[2], ad_bcsw[0], ad_bcsw[2], ad_ccsw[0], ad_ccsw[2]]]
        
 graph_metrics_df = pd.DataFrame(graph_metrics, columns=["i","Links","Weights","BCW","CCW","Stat_Weights","p-value_Weights","Stat_BC", "p-value_BC","Stat_CC", "p-value_CC","Stat_DC", "p-value_DC","Stat_BCW", "p-value_BCW","Stat_CCW", "p-value_CCW","BC","CC","DC","AD_Weights","p-value_Weights","AD_BC", "p-value_BC","AD_CC", "p-value_CC","AD_DC", "p-value_DC","AD_BCW", "p-value_BCW","AD_CCW", "p-value_CCW"])
 
+# distinguish different modes when saving
 if sample_weights:
     graph_metrics_df.to_csv("graph_metrics_"+name+"_hybrid"+"_"+str(clusters)+".csv",index=False,sep=";")
 elif color == "BW":

@@ -28,22 +28,20 @@ np.random.seed(0)
 python_random.seed(0)
 tf.random.set_seed(0)
 
-name = "BREN"
-clusters = 4
+name = "BREN" # one of GEANT2001, BREN, BTNORTHAMERICA, GTSSLOVAKIA
+clusters = 4 # 2,3,4
 graph_metrics = []
-algo ="2K"
+algo ="2K" # one of BA, ER, WS, 2K
 load = False
 save = True
 
+# load real matrix from adj_matrices folder
 adj_matrix_real = np.loadtxt("adj_matrices\\"+name+"_weighted.txt")
 maximum_dist = np.max(adj_matrix_real)
-
-
 real = nx.Graph(np.squeeze(adj_matrix_real),data = True)
 
+####### graph metrics of real network #######
 links_real = len(real.edges)
-
-
 weights_real = list(get_edge_attributes(real, 'weight').values())
 
 bcs_real = list(nx.betweenness_centrality(real).values())
@@ -59,8 +57,8 @@ dc_real = np.mean(dcs_real)
 
 bcw_real = np.mean(bcsw_real)
 ccw_real = np.mean(ccsw_real)
+##########################################
 
-name = name
 if clusters == 4:
     paths = [name+"_local_0_c4\\", name+"_local_1_c4\\", name+"_local_2_c4\\", name+"_local_3_c4\\",name+"_global_c4\\"]
 if clusters == 3:
@@ -105,7 +103,9 @@ for k in range(1000):
         elif "global" in path:
             if algo == "2K":
                 synth = synth_2K(partial_view, False)
-            
+            else:
+                print("Not supported yet.")
+                exit()          
                 
         mapping = dict(zip(sorted(synth), nodes.astype(int)))
         synth = nx.relabel_nodes(synth, mapping)
@@ -152,6 +152,7 @@ for k in range(1000):
         with open(path +"/synth_sample_"+algo+"_"+str(k)+".pkl","rb") as f:
             full_graph = pickle.load(f)
     
+    ####### graph metrics of synthetic network #######
     links = len(full_graph.edges)
     weights = list(get_edge_attributes(full_graph, 'weight').values())
     
@@ -162,6 +163,7 @@ for k in range(1000):
     bcsw = list(nx.betweenness_centrality(full_graph,weight='weight').values())
     ccsw = list(nx.closeness_centrality(full_graph, distance = 'weight').values())
     
+    # Kolgomorov-Smirnov test real vs synth
     ks_weights = (stats.ks_2samp(weights_real, weights))
     ks_bcs = (stats.ks_2samp(bcs_real, bcs))
     ks_ccs = (stats.ks_2samp(ccs_real, ccs))
@@ -169,6 +171,7 @@ for k in range(1000):
     ks_bcsw = (stats.ks_2samp(bcsw_real, bcsw))
     ks_ccsw = (stats.ks_2samp(ccsw_real, ccs))
     
+    # Anderson-Darling test real vs synth
     ad_weights = (stats.anderson_ksamp([weights_real, weights]))
     ad_bcs = (stats.anderson_ksamp([bcs_real, bcs]))
     ad_ccs = (stats.anderson_ksamp([ccs_real, ccs]))
@@ -182,8 +185,10 @@ for k in range(1000):
     
     bcw = np.mean(bcsw)
     ccw = np.mean(ccsw)
- 
+    ##########################################
+    
     graph_metrics =  graph_metrics + [[k,links, sum(weights), bcw, ccw, ks_weights[0], ks_weights[1], ks_bcs[0], ks_bcs[1], ks_ccs[0], ks_ccs[1], ks_dcs[0], ks_dcs[1], ks_bcsw[0], ks_bcsw[1], ks_ccsw[0], ks_ccsw[1], bc, cc, dc, ad_weights[0], ad_weights[2], ad_bcs[0], ad_bcs[2], ad_ccs[0], ad_ccs[2], ad_dcs[0], ad_dcs[2], ad_bcsw[0], ad_bcsw[2], ad_ccsw[0], ad_ccsw[2]]]
+
 graph_metrics_df = pd.DataFrame(graph_metrics, columns=["i","Links","Weights","BCW","CCW","Stat_Weights","p-value_Weights","Stat_BC", "p-value_BC","Stat_CC", "p-value_CC","Stat_DC", "p-value_DC","Stat_BCW", "p-value_BCW","Stat_CCW", "p-value_CCW","BC","CC","DC","AD_Weights","p-value_Weights","AD_BC", "p-value_BC","AD_CC", "p-value_CC","AD_DC", "p-value_DC","AD_BCW", "p-value_BCW","AD_CCW", "p-value_CCW"])
 graph_metrics_df.to_csv("graph_metrics_"+algo+"_"+name+"_"+str(clusters)+".csv",index=False,sep=";")
 

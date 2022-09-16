@@ -23,10 +23,11 @@ def reset_random_seeds():
    np.random.seed(0)
    random.seed(0)
 
-# Fix seed
+# Fix seed for reproducibility of clustering, seeds for GAN are reset in WANGAN.py to test different ones
 reset_random_seeds()
+
 name = "bren"
-clusters = 4
+clusters = 4 # 2,3,4
 
 for i in range(clusters):
     isExist = os.path.exists(name + "_local_"+ str(i)+"_c"+str(clusters))
@@ -39,15 +40,6 @@ if not isExist:
 
 adj_matrix = np.loadtxt("adj_matrices\\"+ name + "_weighted.txt")
 G_weighted = nx.from_numpy_matrix(adj_matrix)
-
-# maximum_dist = np.max(adj_matrix)
-# adj_matrix = (adj_matrix / maximum_dist)
-# sim_matrix = copy.deepcopy(adj_matrix)
-# sim_matrix[adj_matrix != 0] = 1 - adj_matrix[adj_matrix != 0]
-# sim_matrix[adj_matrix == 0] = 0
-
-# perm_unweighted = copy.deepcopy(adj_matrix)
-# perm_unweighted[perm_unweighted > 0]=1
 
 sp_matrix = np.asarray(np.zeros(shape=(len(G_weighted),len(G_weighted),)))
 for src in G_weighted.nodes:
@@ -73,7 +65,9 @@ plt.show()
 adj_matrix = np.loadtxt("adj_matrices\\"+ name + "_weighted.txt")
 G_weighted = nx.from_numpy_matrix(adj_matrix) 
 
+# Global view first
 for seed in range(10):
+    # below can actually happen outside the loop and repeating is overhead... ToDo
     nodes = []
     edges = []
     global_view = nx.Graph()
@@ -87,36 +81,34 @@ for seed in range(10):
             if src_cluster != trg_cluster:
                 nodes = nodes + [src, trg]
                 edges.append(edge)
-                
-                
+                             
     global_view.add_edges_from(edges)
-    #nodes = np.unique(nodes)
     
+    # here we maintain the node -> label ordering the way it appeared/was added to the global view graph, so we can map them later again
+    # In other words: when transforming to numpy matrix, the first column/row does not necessarily correspond to node with label 1 anymore
     indexes = np.unique(nodes, return_index=True)[1]
     nodes = np.array([nodes[index] for index in sorted(indexes)])
     np.savetxt(name +"_global_c"+str(clusters)+"/nodes.txt", nodes.astype(int), fmt = "%i")
-    #np.savetxt(name +"_global_c"+str(clusters)+"/nodes.txt", edges.astype(int), fmt = "%i")
+
     with open(name +"_global_c"+str(clusters)+"/edges.pkl","wb") as f:
         pickle.dump(edges,f)
        
-    #global_view2 = adj_matrix[np.ix_(nodes, nodes)]
-    
     network_to_synthesize = nx.to_numpy_matrix(global_view)
-    
-    
+     
     learning_rate = 0.0001
     epochs = 200
     batch_size = 50
     samples = 5000
     if len(global_view) >= 16:
         learning_rate = 0.001
-
-    
+  
     WANGAN(name + "_global_c"+str(clusters), network_to_synthesize, batch_size, learning_rate, epochs, samples, True, seed)
     
+
+# Local views, for each 10 runs with differet seeds
 for i in range(len(np.unique(labels))):
     for seed in range(10):       
-            idx = list(np.where(labels == i))[0]
+            idx = list(np.where(labels == i))[0] # here nodes are in ascending order by default in the np.matrix, so no mapping like for global needed
             local = adj_matrix[np.ix_(idx, idx)]
             network_to_synthesize = local
             learning_rate = 0.0001
