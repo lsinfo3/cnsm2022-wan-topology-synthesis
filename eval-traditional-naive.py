@@ -23,14 +23,14 @@ def get_edge_attributes(G, name):
     return dict( (x[:-1], x[-1][name]) for x in edges if name in x[-1] )
 
 names = ["GTSSLOVAKIA", "BREN", "GEANT2001", "BTNORTHAMERICA"]
-algos = ["2K", "BA", "ER", "WS"]
+algos = ["ER", "BA", "WS", "2K"]
 
 load = False
 save = True
 for name in names:
     for algo in algos:
         
-        # set seed for every algo, so that loop iterations a not dependent in terms of random numbers...
+        # set seed for every algo, so that loop iterations are not dependent in terms of random numbers...
         np.random.seed(0)
         python_random.seed(0)
         tf.random.set_seed(0)
