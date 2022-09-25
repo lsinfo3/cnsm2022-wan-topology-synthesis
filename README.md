@@ -12,7 +12,7 @@ These archives contain the generated networks for all of the investigated genera
 
 For the *traditional* generations (2K, ER, BA, WS), it contains 1000 files each in the following format:
 
-*synth\_sample_<generator>\_ <i>.pkl*, which are NetworkX graphs (*nx.Graph()*).
+*synth\_sample_\<generator\>\_ <i>.pkl*, which are NetworkX graphs (*nx.Graph()*).
 
 For the GAN, the contained data is more complex. First, there are files named *image\_at\_epoch\_1000_s_(BW|RGB).pdf*, which showcase **samples** of the generated networks, just for some visualization, other than that, they have **no** further use.
 
