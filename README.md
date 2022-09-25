@@ -14,7 +14,7 @@ For the *traditional* generations (2K, ER, BA, WS), it contains 1000 files each 
 
 *synth\_sample_\<generator\>\_ i.pkl*, which are NetworkX graphs (*nx.Graph()*).
 
-For the GAN, the contained data is more complex. First, there are files named *image\_at\_epoch\_1000_s_(BW|RGB).pdf*, which showcase **samples** of the generated networks, just for some visualization, other than that, they have **no** further use.
+For the GAN, the contained data is more complex. First, there are files named *image\_at\_epoch\_1000_s_(BW|RGB).pdf*, which showcase **samples** of the generated networks for each of the then seeds *s*, just for some visualization, other than that, they have **no** further use.
 
 Furthermore, for the GAN, there are files named *sample\_at\_epoch\_1000_s\_i_(BW|RGB).pkl*, which are the raw files that the GAN produced with seed *s*. These are NumPy Arrays (*np.array()*) with dimensions *n x n x 1* for BW and *n x n x 3* for RGB.
 
