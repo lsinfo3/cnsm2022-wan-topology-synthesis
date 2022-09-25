@@ -6,7 +6,7 @@ This repository contains the source code and (generated) datasets used in the CN
 
 ### *plot_data* and *data*
 
-### <network>\_naive.zip
+### \<network\>\_naive.zip
 
 These archives contain the generated networks for all of the investigated generators.
 
@@ -20,7 +20,7 @@ Furthermore, for the GAN, there are files named *sample\_at\_epoch\_1000_s\_i_(B
 
 Next and last, there are files named *synth_sample\_i\_s\_weightssampled?\_(BW|RGB).pkl*. These are the postprocessed samples for the GAN, for seed *s* and *weightssampled?* is a boolean (so, 0 or 1), which specifies if the weights were sampled onto the graph. Like for the traditional generators, these are NetworkX graphs (*nx.Graph()*).
 
-### <network>\_hierarchical.zip
+### \<network\>\_hierarchical.zip
 
 ### eval\_(traditional|gan)\_(naive|hierarchical).py
 
