@@ -1,6 +1,6 @@
 # Comparing Traditional and GAN-based Approaches for the Synthesis of Wide Area Network Topologies
 
-This repository contains the source code and (generated) datasets used in the CNSM2022 paper *Comparing Traditional and GAN-based Approaches for the Synthesis of Wide Area Network Topologies*. Below is an overview of the contained folders and files.
+This repository contains the source code and (generated) datasets used in the CNSM2022 paper *Comparing Traditional and GAN-based Approaches for the Synthesis of Wide Area Network Topologies*. Below is an overview of the contained folders and files. [More info below to come :)]
 
 ### *adj_matrices*
 
