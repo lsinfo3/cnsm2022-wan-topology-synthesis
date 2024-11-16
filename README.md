@@ -34,4 +34,4 @@ Contains the source code, including some helper functions for transforming the .
 
 There are four *eval* scripts, two for the naive approach for GAN-based and traditional approaches, and two for the hierarchical approach. Note that the traditionally generated network are created in an ad-hoc manner by calling the *traditional.py* script due to their simplicity here (can be controlled via *save* and load *parameters*, if this is not wanted).
 
-Lastly, there is the *read_zoo_revied.py* script, which takes the .ned files from the OOS (https://github.com/lsinfo3/OpenFlowOMNeTSuite/tree/master/openflow/networks) and transforms them into the adjacency matrices, weighted and unweighted ones.
+Lastly, there is the *read_zoo_revised.py* script, which takes the .ned files from the OOS (https://github.com/lsinfo3/OpenFlowOMNeTSuite/tree/master/openflow/networks) and transforms them into the adjacency matrices, weighted and unweighted ones.
