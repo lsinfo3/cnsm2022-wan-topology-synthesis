@@ -3,6 +3,7 @@
 This repository contains the source code and (generated) datasets used in the CNSM2022 paper *Comparing Traditional and GAN-based Approaches for the Synthesis of Wide Area Network Topologies*. Below is an overview of the contained folders and files. [More info below to come :)]
 
 ### *adj_matrices*
+
 Adjancecy matrices of the networks extracted from the OOS. See *code* for more info.
 
 ### *plot_data* and *plots*
@@ -26,11 +27,14 @@ Next and last, there are files named *synth_sample\_i\_s\_weightssampled?\_(BW|R
 For the single hierarchical example, it contains multiple subfolders for local and global views.
 
 ### *code*
+
 Contains the source code, including some helper functions for transforming the .ned files from the OOS into the matrices of the adj_matrices folder.
 
 *wangan.py* is the main functionality that trains the GANs and saves in the end the generated samples.
 
-*WANGAN-simple.py* and *WANGAN-hierarchical* call the previous script to either perform the naive approach or the hierarchical approach.
+*WANGAN-simple.py* and *WANGAN-hierarchical* call the previous script to either perform the naive approach or the hierarchical approach. 
+
+<sup>Note that since we trained the GANs on GPU, results may differ even though seeds are set (e.g., due to parallelization or non-deterministic GPU ops), especially for the RBG-based GANs; but general trends should remain the same.</sup>
 
 There are four *eval* scripts, two for the naive approach for GAN-based and traditional approaches, and two for the hierarchical approach. Note that the traditionally generated network are created in an ad-hoc manner by calling the *traditional.py* script due to their simplicity here (can be controlled via *save* and load *parameters*, if this is not wanted).
 
