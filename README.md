@@ -34,7 +34,7 @@ Contains the source code, including some helper functions for transforming the .
 
 *WANGAN-simple.py* and *WANGAN-hierarchical* call the previous script to either perform the naive approach or the hierarchical approach. 
 
-<sup>Note that since we trained the GANs on GPU, results may differ even though seeds are set (e.g., due to parallelization or non-deterministic GPU ops), especially for the RBG-based GANs; but general trends should remain the same.</sup>
+<sup>Note that since we trained the GANs on GPU, results may differ even though seeds are set (e.g., due to parallelization or non-deterministic GPU ops), especially for the RGB-based GANs; but general trends should remain the same. For TensorFlow >= 2.9.0 there are now options via *tf.config.experimental.enable_op_determinism*, so you might want to check this out, since research on our work started more than half a year prior to that release.</sup>
 
 There are four *eval* scripts, two for the naive approach for GAN-based and traditional approaches, and two for the hierarchical approach. Note that the traditionally generated network are created in an ad-hoc manner by calling the *traditional.py* script due to their simplicity here (can be controlled via *save* and load *parameters*, if this is not wanted).
 
