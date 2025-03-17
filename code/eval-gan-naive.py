@@ -110,6 +110,9 @@ for name in names:
                         for i in range(len(adj_matrix)):
                             for j in range(len(adj_matrix)):
         		            	# choose if link exists according to Bernoulli distribution
+                                ### note that iterating through all i's and j's is redudant, since we set [i][j] and [j][i] twice now...
+                                ### so one "round" is simply overwritten. it's not wrong, but unnecessary
+                                ### leaving it in for reproducibility now though, since it changes the rng...
                                 sum_entries = adj_matrix[i][j][0] + adj_matrix[j][i][0]
                                 decision = np.random.choice([0,1], p=[1-(sum_entries/2),(sum_entries/2)])
                                 extracted_unweighted[i][j][0] = decision
@@ -123,6 +126,7 @@ for name in names:
                             for i in range(len(extracted_unweighted)):
                                 for j in range(len(extracted_unweighted)):
                                     avg_dist =  (adj_matrix[i][j][1] +  adj_matrix[j][i][1])/2 # link weight as average of the symmetric entries, if the decided above that the link exists                           
+                                    ### same as above with comment due to redudancy
                                     if extracted_unweighted[i][j][0] ==1.0 and extracted_unweighted[j][i][0] ==1.0:
                                         extracted_weighted[i][j][0] = np.max([avg_dist, 1/maximum_dist]) # 1 is the minimum distance, so we can cap it off there/smooth it out
                                         extracted_weighted[j][i][0] = np.max([avg_dist, 1/maximum_dist])
@@ -166,7 +170,10 @@ for name in names:
                                 extracted_weighted = np.asarray(np.zeros(shape=(len(adj_matrix),len(adj_matrix),1)))
                                 for i in range(len(extracted_unweighted)):
                                     for j in range(len(extracted_unweighted)):
+                                        ### same as above with comment due to redudancy
                                         if extracted_unweighted[i][j][0] ==1.0 and extracted_unweighted[j][i][0] ==1.0:
+                                                ### setting different weights does not really matter, since nx.Graph() below only takes one half anyway
+                                                ### still, leaving it in now due to rng and reproducibility...
                                                 extracted_weighted[i][j][0] = np.random.choice(weights) # actually sample the weights if link exists
                                                 extracted_weighted[j][i][0] = np.random.choice(weights)
                                         

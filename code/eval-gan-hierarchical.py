@@ -96,6 +96,9 @@ for clusters in [2, 3, 4]:
                         extracted_unweighted = np.asarray(np.zeros(shape=(len(adj_matrix),len(adj_matrix),1)))
                         
                         # same as for the naive/flat approach: decide via Bernoulli distribution which links are actually taken
+                        ### again: note that iterating through all i's and j's is redudant, since we set [i][j] and [j][i] twice now...
+                        ### so one "round" is simply overwritten. it's not wrong, but unnecessary
+                        ### leaving it in for reproducibility now though, since it changes the rng...
                         for i in range(len(adj_matrix)):
                             for j in range(len(adj_matrix)):
                                 sum_entries = adj_matrix[i][j][0] + adj_matrix[j][i][0]
@@ -132,6 +135,7 @@ for clusters in [2, 3, 4]:
                                 for j in range(len(extracted_unweighted)):
                                     # take avg dist. if linke exists
                                     avg_dist =  (adj_matrix[i][j][1] +  adj_matrix[j][i][1])/2
+                                    ### same as above with comment due to redudancy
                                     if extracted_unweighted[i][j][0] == 1.0 and extracted_unweighted[j][i][0] ==1.0:
                                         extracted_weighted[i][j][0] = np.max([avg_dist, 1/real_max_dist])
                                         extracted_weighted[j][i][0] = np.max([avg_dist, 1/real_max_dist])
@@ -188,7 +192,10 @@ for clusters in [2, 3, 4]:
         
                                 for i in range(len(extracted_unweighted)):
                                     for j in range(len(extracted_unweighted)):
+                                        ### same as above with comment due to redudancy
                                         if extracted_unweighted[i][j][0] ==1.0 and extracted_unweighted[j][i][0] ==1.0:
+                                                ### setting different weights does not really matter, since nx.Graph() below only takes one half anyway
+                                                ### still, leaving it in now due to rng and reproducibility...
                                                 extracted_weighted[i][j][0] = np.random.choice(weights)
                                                 extracted_weighted[j][i][0] = np.random.choice(weights)
                                         
