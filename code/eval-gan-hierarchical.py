@@ -97,7 +97,7 @@ for clusters in [2, 3, 4]:
                         
                         # same as for the naive/flat approach: decide via Bernoulli distribution which links are actually taken
                         ### again: note that iterating through all i's and j's is redudant, since we set [i][j] and [j][i] twice now...
-                        ### so one "round" is simply overwritten. it's not wrong, but unnecessary
+                        ### so one "round" is simply overwritten. it's not wrong, since it doesn't change the distribution whatsoever, but unnecessary
                         ### leaving it in for reproducibility now though, since it changes the rng...
                         for i in range(len(adj_matrix)):
                             for j in range(len(adj_matrix)):
@@ -195,6 +195,7 @@ for clusters in [2, 3, 4]:
                                         ### same as above with comment due to redudancy
                                         if extracted_unweighted[i][j][0] ==1.0 and extracted_unweighted[j][i][0] ==1.0:
                                                 ### setting different weights does not really matter, since nx.Graph() below only takes one half anyway
+                                                ### again, not wrong, since it doesn't change the distribution whatsoever, just unneccessary
                                                 ### still, leaving it in now due to rng and reproducibility...
                                                 extracted_weighted[i][j][0] = np.random.choice(weights)
                                                 extracted_weighted[j][i][0] = np.random.choice(weights)

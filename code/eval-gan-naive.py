@@ -111,7 +111,7 @@ for name in names:
                             for j in range(len(adj_matrix)):
         		            	# choose if link exists according to Bernoulli distribution
                                 ### note that iterating through all i's and j's is redudant, since we set [i][j] and [j][i] twice now...
-                                ### so one "round" is simply overwritten. it's not wrong, but unnecessary
+                                ### so one "round" is simply overwritten. it's not wrong, since it doesn't change the distribution whatsoever, but unnecessary
                                 ### leaving it in for reproducibility now though, since it changes the rng...
                                 sum_entries = adj_matrix[i][j][0] + adj_matrix[j][i][0]
                                 decision = np.random.choice([0,1], p=[1-(sum_entries/2),(sum_entries/2)])
@@ -173,6 +173,7 @@ for name in names:
                                         ### same as above with comment due to redudancy
                                         if extracted_unweighted[i][j][0] ==1.0 and extracted_unweighted[j][i][0] ==1.0:
                                                 ### setting different weights does not really matter, since nx.Graph() below only takes one half anyway
+                                                ### again, not wrong, since it doesn't change the distribution whatsoever, just unneccessary
                                                 ### still, leaving it in now due to rng and reproducibility...
                                                 extracted_weighted[i][j][0] = np.random.choice(weights) # actually sample the weights if link exists
                                                 extracted_weighted[j][i][0] = np.random.choice(weights)
