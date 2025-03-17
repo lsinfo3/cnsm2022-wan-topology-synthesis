@@ -128,7 +128,11 @@ for name in names:
                                     avg_dist =  (adj_matrix[i][j][1] +  adj_matrix[j][i][1])/2 # link weight as average of the symmetric entries, if the decided above that the link exists                           
                                     ### same as above with comment due to redudancy
                                     if extracted_unweighted[i][j][0] ==1.0 and extracted_unweighted[j][i][0] ==1.0:
-                                        extracted_weighted[i][j][0] = np.max([avg_dist, 1/maximum_dist]) # 1 is the minimum distance, so we can cap it off there/smooth it out
+                                        # 1 is the minimum distance, so we can cap it off there/smooth it out
+                                        ### idea: it might be cleaner to just do to min-max normalizing before training only w.r.t. to ONLY weights > 0 and then do * max_dist + min_dist instead of only * max_dist below
+                                        ### -> that would achieve the same (=ensuring weights are within bounds) and feel more "implicit" than capping, i guess
+                                        ### -> having weights of 0 in the 2nd channel should not be an issue since we have the 1st channel to signify connections... i initially thought that that could be an issue
+                                        extracted_weighted[i][j][0] = np.max([avg_dist, 1/maximum_dist]) 
                                         extracted_weighted[j][i][0] = np.max([avg_dist, 1/maximum_dist])
                                         
                             extracted_weighted = extracted_weighted * maximum_dist # rescale the networks, as it was normalized during synthesis
