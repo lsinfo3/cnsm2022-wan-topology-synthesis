@@ -137,6 +137,10 @@ for clusters in [2, 3, 4]:
                                     avg_dist =  (adj_matrix[i][j][1] +  adj_matrix[j][i][1])/2
                                     ### same as above with comment due to redudancy
                                     if extracted_unweighted[i][j][0] == 1.0 and extracted_unweighted[j][i][0] ==1.0:
+                                        # cap lower boundary like in the naive approach since we know what min and max are
+                                        ### idea: it might be cleaner to just do to min-max normalizing before training only w.r.t. to ONLY weights > 0 and then do * max_dist + min_dist instead of only * max_dist below
+                                        ### -> that would achieve the same (=ensuring weights are within bounds) and feel more "implicit" than capping, i guess
+                                        ### -> having weights of 0 in the 2nd channel should not be an issue since we have the 1st channel to signify connections... i initially thought that that could be an issue
                                         extracted_weighted[i][j][0] = np.max([avg_dist, 1/real_max_dist])
                                         extracted_weighted[j][i][0] = np.max([avg_dist, 1/real_max_dist])
                                         
