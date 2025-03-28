@@ -8,7 +8,7 @@ Adjancecy matrices of the networks extracted from the OOS. See *code* for more i
 
 ### *plot_data* and *plots*
 
-As the name suggests, the plots and corresponding that from the paper, for all generators (2K, BA, WS, ER, for GAN: RGB and BW). For the hierarchical case the endings "_2", "_3", "_4" illustrate the number of clusters. Note that the data for the "weighted DC" as defined in the paper can be derived from the "Weights" column by computing **Weights*2/Nodes** (it's what is shown in the plots, just for clarification).
+As the name suggests, the plots and corresponding that from the paper, for all generators (2K, BA, WS, ER, for GAN: RGB and BW). For the hierarchical case the endings "_2", "_3", "_4" illustrate the number of clusters. Note that the data for the "weighted DC" as defined in the paper can be derived from the "Weights" column (which contains the sum of all edge weights of the whole network) by computing **Weights*2/Nodes**, since the average weighted DC is simply just two times the sum of all network weights (since each edge is counted in twice) divided by the number of nodes (it's what is shown in the plots, just for clarification).
 
 ### *synthetic\_networks*
 
